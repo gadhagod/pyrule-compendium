@@ -93,7 +93,7 @@ class compendium(object):
 
         return(get(self.url).json()["data"])
 
-    def download_entry_image(self, entry, output_file: str) -> dict:
+    def download_entry_image(self, entry, output_file: str) -> tuple:
         """
         Download the image of a compendium entry.
 
