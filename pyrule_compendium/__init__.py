@@ -7,7 +7,7 @@ class NoCategoryError(Exception):
 
     Parameters:
         * `target_category`: Non-existant input category that causes error.
-            - type: string, int
+            - type: string
     """
 
     def __init__(self, target_category: str):
@@ -20,7 +20,7 @@ class NoEntryError(Exception):
 
     Parameters:
         * `target_entry`: Non-existant input entry that causes error.
-            - type: string
+            - type: string, int
     """
 
     def __init__(self, target_entry):
