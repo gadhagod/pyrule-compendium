@@ -5,9 +5,9 @@ class NoCategoryError(Exception):
     """
     Raised when a given category does not exist in the compendium
 
-    Parameter:
+    Parameters:
         * `target_category`: Non-existant input category that causes error.
-            - type: string
+            - type: string, int
     """
 
     def __init__(self, target_category: str):
