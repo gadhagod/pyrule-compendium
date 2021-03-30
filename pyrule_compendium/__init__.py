@@ -46,7 +46,7 @@ class compendium(object):
     def __init__(self, url: str="https://botw-compendium.herokuapp.com/api/v2"):
         self.url = url
 
-    def get_entry(self, entry) -> dict:
+    def get_entry(self, entry, timeout=None) -> dict:
         """
         Gets an entry from the compendium.
 
@@ -58,13 +58,13 @@ class compendium(object):
             - type: dict
         """
 
-        res = get(f"{self.url}/entry/{entry}").json()["data"]
+        res = get(f"{self.url}/entry/{entry}", timeout=timeout).json()["data"]
         if res == {}:
             raise NoEntryError(entry)
 
         return res
 
-    def get_category(self, category: str) -> dict:
+    def get_category(self, category: str, timeout=None) -> dict:
         """
         Gets all entries from a category in the compendium.
 
@@ -81,9 +81,9 @@ class compendium(object):
         if category not in ["creatures", "equipment", "materials", "monsters", "treasure"]:
             raise NoCategoryError(category)
 
-        return get(f"{self.url}/category/{category}").json()["data"]
+        return get(f"{self.url}/category/{category}", timeout=timeout).json()["data"]
 
-    def get_all(self) -> dict:
+    def get_all(self, timeout=None) -> dict:
         """
         Get all entries from the compendium.
 
@@ -91,9 +91,9 @@ class compendium(object):
             - type: dict
         """
 
-        return(get(self.url).json()["data"])
+        return(get(self.url, timeout=timeout).json()["data"])
 
-    def download_entry_image(self, entry, output_file: str) -> tuple:
+    def download_entry_image(self, entry, output_file: str, get_entry_timeout=None) -> tuple:
         """
         Download the image of a compendium entry.
 
@@ -107,5 +107,5 @@ class compendium(object):
             - type: tuple
         """
 
-        img_link = self.get_entry(entry)["image"]
+        img_link = self.get_entry(entry, timeout=get_entry_timeout)["image"]
         return(urlretrieve(img_link, output_file))
