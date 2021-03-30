@@ -30,6 +30,8 @@ class NoEntryError(Exception):
             self.message = f"Entry with ID {self.target_entry} not found."
         elif isinstance(self.target_entry, str):
             self.message = f"Entry with name '{self.target_entry}' not found"
+        else:
+            self.message = f"Type '{type(self.target_entry).__name__}' invalid for entry indexing"
         
         super().__init__(self.message)
 
@@ -41,10 +43,15 @@ class compendium(object):
         * `url`: The base URL for the API.
             - default: "https://botw-compendium.herokuapp.com/api/v2"
             - type: string
+        * `default_timeout`: Default seconds to wait for response for all API calling functions until raising `requests.exceptions.ReadTimeout`
+            - default: `None` (meaning no timeout)
+            - type: integer, float, tuple (for connect and read timeouts)
+            - notes: If a API calling function has a parameter `timeout`, it will overide this
     """
 
-    def __init__(self, url: str="https://botw-compendium.herokuapp.com/api/v2"):
+    def __init__(self, url: str="https://botw-compendium.herokuapp.com/api/v2", default_timeout=None):
         self.url = url
+        self.default_timeout = default_timeout
 
     def get_entry(self, entry, timeout=None) -> dict:
         """
@@ -53,10 +60,16 @@ class compendium(object):
         Parameters:
             * `entry`: The entry to be retrieved.
                 - type: string, int
+            * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
+                - default: `compendium.default_timeout`
+                - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: Metadata on the entry
             - type: dict
         """
+
+        if not timeout:
+            timeout = self.default_timeout
 
         res = get(f"{self.url}/entry/{entry}", timeout=timeout).json()["data"]
         if res == {}:
@@ -72,11 +85,17 @@ class compendium(object):
             * `category`: The name of the category to be retrieved. Must be one of the compendium categories.
                 - type: string
                 - notes: must be in ["creatures", "equipment", "materials", "monsters", "treasure"]
+            * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
+                - default: `compendium.default_timeout`
+                - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: All entries in the category. 
             - type: dict
             - notes: the response schema of `creatures` is different from the others, as it has two sub categories: food and non_food
         """
+
+        if not timeout:
+            timeout = self.default_timeout
 
         if category not in ["creatures", "equipment", "materials", "monsters", "treasure"]:
             raise NoCategoryError(category)
@@ -87,9 +106,17 @@ class compendium(object):
         """
         Get all entries from the compendium.
 
+        Parameters:
+            * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
+                - default: `compendium.default_timeout`
+                - type: integer, float, tuple (for connect and read timeouts)
+
         Returns: all items in the compendium with their metadata nested in categories.
             - type: dict
         """
+
+        if not timeout:
+            timeout = self.default_timeout
 
         return(get(self.url, timeout=timeout).json()["data"])
 
@@ -102,10 +129,16 @@ class compendium(object):
                 - type: str, int
             * `output_file`: The output file's path.
                 - type: str
+            * `get_entry_timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`.
+                - default: `compendium.default_timeout`
+                - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: path to the newly created image and the resulting HTTPMessage object.
             - type: tuple
         """
+
+        if not get_entry_timeout:
+            get_entry_timeout = self.default_timeout
 
         img_link = self.get_entry(entry, timeout=get_entry_timeout)["image"]
         return(urlretrieve(img_link, output_file))
