@@ -61,7 +61,7 @@ class compendium(object):
             * `entry`: The entry to be retrieved.
                 - type: string, int
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
-                - default: `compendium.default_timeout`
+                - default: `self.default_timeout`
                 - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: Metadata on the entry
@@ -86,7 +86,7 @@ class compendium(object):
                 - type: string
                 - notes: must be in ["creatures", "equipment", "materials", "monsters", "treasure"]
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
-                - default: `compendium.default_timeout`
+                - default: `self.default_timeout`
                 - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: All entries in the category. 
@@ -108,7 +108,7 @@ class compendium(object):
 
         Parameters:
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
-                - default: `compendium.default_timeout`
+                - default: `self.default_timeout`
                 - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: all items in the compendium with their metadata nested in categories.
@@ -130,7 +130,7 @@ class compendium(object):
             * `output_file`: The output file's path.
                 - type: str
             * `get_entry_timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`.
-                - default: `compendium.default_timeout`
+                - default: `self.default_timeout`
                 - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: path to the newly created image and the resulting HTTPMessage object.
