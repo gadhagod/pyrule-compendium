@@ -1,5 +1,7 @@
+from http.client import HTTPMessage
 from requests import get
 from urllib.request import urlretrieve
+from typing import Union, Tuple
 
 class NoCategoryError(Exception):
     """
@@ -23,9 +25,10 @@ class NoEntryError(Exception):
             - type: string, int
     """
 
-    def __init__(self, target_entry):
+    def __init__(self, target_entry: Union[str, int]):
         self.target_entry = target_entry
 
+        self.message: str
         if isinstance(self.target_entry, int):
             self.message = f"Entry with ID {self.target_entry} not found."
         elif isinstance(self.target_entry, str):
@@ -49,11 +52,11 @@ class compendium(object):
             - notes: If a API calling function has a parameter `timeout`, it will overide this
     """
 
-    def __init__(self, url: str="https://botw-compendium.herokuapp.com/api/v2", default_timeout=None):
+    def __init__(self, url: str="https://botw-compendium.herokuapp.com/api/v2", default_timeout: Union[int, float, None]=None):
         self.url = url
         self.default_timeout = default_timeout
 
-    def get_entry(self, entry, timeout=None) -> dict:
+    def get_entry(self, entry: Union[str, int], timeout: Union[float, int, None]=None) -> dict:
         """
         Gets an entry from the compendium.
 
@@ -71,13 +74,13 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        res = get(f"{self.url}/entry/{entry}", timeout=timeout).json()["data"]
+        res: dict = get(f"{self.url}/entry/{entry}", timeout=timeout).json()["data"]
         if res == {}:
             raise NoEntryError(entry)
 
         return res
 
-    def get_category(self, category: str, timeout=None) -> dict:
+    def get_category(self, category: str, timeout: Union[float, int, None]=None) -> Union[dict, list]:
         """
         Gets all entries from a category in the compendium.
 
@@ -90,7 +93,7 @@ class compendium(object):
                 - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: All entries in the category. 
-            - type: dict
+            - type: list, dict (for creatures)
             - notes: the response schema of `creatures` is different from the others, as it has two sub categories: food and non_food
         """
 
@@ -102,7 +105,7 @@ class compendium(object):
 
         return get(f"{self.url}/category/{category}", timeout=timeout).json()["data"]
 
-    def get_all(self, timeout=None) -> dict:
+    def get_all(self, timeout: Union[float, int, None]=None) -> dict:
         """
         Get all entries from the compendium.
 
@@ -120,7 +123,7 @@ class compendium(object):
 
         return(get(self.url, timeout=timeout).json()["data"])
 
-    def download_entry_image(self, entry, output_file: str, get_entry_timeout=None) -> tuple:
+    def download_entry_image(self, entry: Union[int, str], output_file: str, get_entry_timeout: Union[int, float, None]=None) -> Tuple[str, HTTPMessage]:
         """
         Download the image of a compendium entry.
 
@@ -140,5 +143,5 @@ class compendium(object):
         if not get_entry_timeout:
             get_entry_timeout = self.default_timeout
 
-        img_link = self.get_entry(entry, timeout=get_entry_timeout)["image"]
+        img_link: str = self.get_entry(entry, timeout=get_entry_timeout)["image"]
         return(urlretrieve(img_link, output_file))
