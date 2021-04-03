@@ -89,7 +89,7 @@ class compendium(object):
 
         return api_req(self.url, timeout=timeout)
 
-    def download_entry_image(self, entry: Union[int, str], output_file: str, get_entry_timeout: Union[int, float, None]=None) -> Tuple[str, HTTPMessage]:
+    def download_entry_image(self, entry: Union[int, str], output_file: Union[str, None]=None, get_entry_timeout: Union[int, float, None]=None) -> Tuple[str, HTTPMessage]:
         """
         Download the image of a compendium entry.
 
@@ -97,10 +97,11 @@ class compendium(object):
             * `entry`: The ID or name of the entry of the image to be downloaded.
                 - type: str, int
             * `output_file`: The output file's path.
+                - default: entry's name with a ".png" extension with spaces replaced by underscores
                 - type: str
             * `get_entry_timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`.
                 - default: `self.default_timeout`
-                - type: integer, float, tuple (for connect and read timeouts)
+                - type: int, float, tuple (for connect and read timeouts)
 
         Returns: path to the newly created image and the resulting HTTPMessage object.
             - type: tuple
@@ -109,5 +110,9 @@ class compendium(object):
         if not get_entry_timeout:
             get_entry_timeout = self.default_timeout
 
-        img_link: str = self.get_entry(entry, timeout=get_entry_timeout)["image"]
-        return(urlretrieve(img_link, output_file))
+        entry_data: dict = self.get_entry(entry, timeout=get_entry_timeout)
+
+        if not output_file:
+            output_file = f"{entry_data['name'].replace(' ', '_')}.png"
+
+        return urlretrieve(entry_data["image"], output_file)
