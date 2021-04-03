@@ -1,42 +1,8 @@
 from http.client import HTTPMessage
-from requests import get
 from urllib.request import urlretrieve
 from typing import Union, Tuple
-
-class NoCategoryError(Exception):
-    """
-    Raised when a given category does not exist in the compendium
-
-    Parameters:
-        * `target_category`: Non-existant input category that causes error.
-            - type: string
-    """
-
-    def __init__(self, target_category: str):
-        self.target_category = target_category
-        super().__init__(f"Category '{self.target_category}' not found. Must be 'creatures', 'equipment', 'materials', 'monsters', or 'treasure'")
-
-class NoEntryError(Exception):
-    """
-    Raised when a given entry does not exist in the compendium
-
-    Parameters:
-        * `target_entry`: Non-existant input entry that causes error.
-            - type: string, int
-    """
-
-    def __init__(self, target_entry: Union[str, int]):
-        self.target_entry = target_entry
-
-        self.message: str
-        if isinstance(self.target_entry, int):
-            self.message = f"Entry with ID {self.target_entry} not found."
-        elif isinstance(self.target_entry, str):
-            self.message = f"Entry with name '{self.target_entry}' not found"
-        else:
-            self.message = f"Type '{type(self.target_entry).__name__}' invalid for entry indexing"
-        
-        super().__init__(self.message)
+from . import exceptions
+from .utils import *
 
 class compendium(object):
     """
@@ -74,9 +40,9 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        res: dict = get(f"{self.url}/entry/{entry}", timeout=timeout).json()["data"]
+        res: dict = api_req(f"{self.url}/entry/{entry}", timeout=timeout)
         if res == {}:
-            raise NoEntryError(entry)
+            raise exceptions.NoEntryError(entry)
 
         return res
 
@@ -101,9 +67,9 @@ class compendium(object):
             timeout = self.default_timeout
 
         if category not in ["creatures", "equipment", "materials", "monsters", "treasure"]:
-            raise NoCategoryError(category)
+            raise exceptions.NoCategoryError(category)
 
-        return get(f"{self.url}/category/{category}", timeout=timeout).json()["data"]
+        return api_req(f"{self.url}/category/{category}", timeout=timeout)
 
     def get_all(self, timeout: Union[float, int, None]=None) -> dict:
         """
@@ -121,7 +87,7 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        return(get(self.url, timeout=timeout).json()["data"])
+        return api_req(self.url, timeout=timeout)
 
     def download_entry_image(self, entry: Union[int, str], output_file: str, get_entry_timeout: Union[int, float, None]=None) -> Tuple[str, HTTPMessage]:
         """
