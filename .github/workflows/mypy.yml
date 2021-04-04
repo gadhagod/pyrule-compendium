@@ -22,4 +22,4 @@ jobs:
 
     - name: Check library typing
       run: |
-        mypy pyrule_compendium/__init__.py
+        pyrule_compendium/*.py
