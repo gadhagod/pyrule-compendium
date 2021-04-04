@@ -1,7 +1,9 @@
 name: Mypy test
 
 on:
-  push
+  push:
+    paths:
+      - pyrule_compendium/*
 
 jobs:
   main:
@@ -20,6 +22,6 @@ jobs:
       run: |
         pip3 install mypy
 
-    - name: Check library typing
+    - name: Check library types
       run: |
-        pyrule_compendium/*.py
+        mypy pyrule_compendium/*.py
