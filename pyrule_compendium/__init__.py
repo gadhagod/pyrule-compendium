@@ -13,7 +13,7 @@ class compendium(object):
             - default: "https://botw-compendium.herokuapp.com/api/v2"
             - type: string
         * `default_timeout`: Default seconds to wait for response for all API calling functions until raising `requests.exceptions.ReadTimeout`
-            - default: `None` (meaning no timeout)
+            - default: `None` (no timeout)
             - type: integer, float, tuple (for connect and read timeouts)
             - notes: If a API calling function has a parameter `timeout`, it will overide this
     """
@@ -28,10 +28,10 @@ class compendium(object):
 
         Parameters:
             * `entry`: The entry to be retrieved.
-                - type: string, int
+                - type: str, int
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
-                - default: `self.default_timeout`
-                - type: integer, float, tuple (for connect and read timeouts)
+                - default: `compendium.default_timeout`
+                - type: int, float, tuple (for connect and read timeouts)
 
         Returns: Metadata on the entry
             - type: dict
@@ -55,7 +55,7 @@ class compendium(object):
                 - type: string
                 - notes: must be in ["creatures", "equipment", "materials", "monsters", "treasure"]
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
-                - default: `self.default_timeout`
+                - default: `compendium.default_timeout`
                 - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: All entries in the category. 
@@ -77,7 +77,7 @@ class compendium(object):
 
         Parameters:
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
-                - default: `self.default_timeout`
+                - default: `compendium.default_timeout`
                 - type: integer, float, tuple (for connect and read timeouts)
 
         Returns: all items in the compendium with their metadata nested in categories.
@@ -100,7 +100,7 @@ class compendium(object):
                 - default: entry's name with a ".png" extension with spaces replaced by underscores
                 - type: str
             * `get_entry_timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`.
-                - default: `self.default_timeout`
+                - default: `compendium.default_timeout`
                 - type: int, float, tuple (for connect and read timeouts)
 
         Returns: path to the newly created image and the resulting HTTPMessage object.
