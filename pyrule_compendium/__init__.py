@@ -9,20 +9,21 @@ class compendium(object):
     Base class for pyrule compendium.
 
     Parameters:
-        * `url`: The base URL for the API.
+        * `base_url`: The base URL for the API.
             - default: "https://botw-compendium.herokuapp.com/api/v2"
             - type: string
+            - notes: Manipulate with `compendium.api.base_url`
         * `default_timeout`: Default seconds to wait for response for all API calling functions until raising `requests.exceptions.ReadTimeout`
             - default: `None` (no timeout)
             - type: integer, float, tuple (for connect and read timeouts)
-            - notes: If a API calling function has a parameter `timeout`, it will overide this
+            - notes: If an API calling function has a parameter `timeout`, it will overide this
     """
 
-    def __init__(self, url: str="https://botw-compendium.herokuapp.com/api/v2", default_timeout: Union[int, float, None]=None):
-        self.url = url
+    def __init__(self, base_url: str="https://botw-compendium.herokuapp.com/api/v2", default_timeout: Union[int, float, None]=None):
+        self.api: type = api(base_url)
         self.default_timeout = default_timeout
 
-    def get_entry(self, entry: Union[str, int], timeout: Union[float, int, None]=None) -> dict:
+    def get_entry(self, entry: types.entry, timeout: types.timeout=None) -> dict:
         """
         Gets an entry from the compendium.
 
@@ -40,13 +41,13 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        res: dict = api_req(f"{self.url}/entry/{entry}", timeout=timeout)
+        res: dict = self.api.request(f"/entry/{entry}", timeout)
         if res == {}:
             raise exceptions.NoEntryError(entry)
 
         return res
 
-    def get_category(self, category: str, timeout: Union[float, int, None]=None) -> Union[dict, list]:
+    def get_category(self, category: str, timeout: types.timeout=None) -> Union[dict, list]:
         """
         Gets all entries from a category in the compendium.
 
@@ -69,7 +70,7 @@ class compendium(object):
         if category not in ["creatures", "equipment", "materials", "monsters", "treasure"]:
             raise exceptions.NoCategoryError(category)
 
-        return api_req(f"{self.url}/category/{category}", timeout=timeout)
+        return self.api.request(f"/category/{category}", timeout)
 
     def get_all(self, timeout: Union[float, int, None]=None) -> dict:
         """
@@ -87,9 +88,9 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        return api_req(self.url, timeout=timeout)
+        return self.api.request(self.api.base_url, timeout)
 
-    def download_entry_image(self, entry: Union[int, str], output_file: Union[str, None]=None, get_entry_timeout: Union[int, float, None]=None) -> Tuple[str, HTTPMessage]:
+    def download_entry_image(self, entry: types.entry, output_file: Union[str, None]=None, get_entry_timeout: types.timeout=None) -> Tuple[str, HTTPMessage]:
         """
         Download the image of a compendium entry.
 
