@@ -20,7 +20,7 @@ class compendium(object):
     """
 
     def __init__(self, base_url: str="https://botw-compendium.herokuapp.com/api/v2", default_timeout: Union[int, float, None]=None):
-        self.api: type = api(base_url)
+        self.api: api = api(base_url)
         self.default_timeout = default_timeout
 
     def get_entry(self, entry: types.entry, timeout: types.timeout=None) -> dict:
