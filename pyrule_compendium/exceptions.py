@@ -1,4 +1,5 @@
 from typing import Union
+from .utils import *
 
 class NoCategoryError(Exception):
     """
@@ -22,7 +23,7 @@ class NoEntryError(Exception):
             - type: str, int
     """
 
-    def __init__(self, target_entry: Union[str, int]):
+    def __init__(self, target_entry: types.entry):
         self.target_entry = target_entry
 
         self.message: str
