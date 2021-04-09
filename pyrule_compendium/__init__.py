@@ -72,7 +72,7 @@ class compendium(object):
 
         return self.api.request(f"/category/{category}", timeout)
 
-    def get_all(self, timeout: Union[float, int, None]=None) -> Union[dict, list]:
+    def get_all(self, timeout: types.timeout=None) -> Union[dict, list]:
         """
         Get all entries from the compendium.
 
