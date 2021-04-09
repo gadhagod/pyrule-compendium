@@ -88,7 +88,7 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        return self.api.request(self.api.base_url, timeout)
+        return api_req(self.api.base_url, timeout)
 
     def download_entry_image(self, entry: types.entry, output_file: Union[str, None]=None, get_entry_timeout: types.timeout=None) -> Tuple[str, HTTPMessage]:
         """
