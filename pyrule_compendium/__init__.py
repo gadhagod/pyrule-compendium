@@ -1,6 +1,6 @@
 from http.client import HTTPMessage
-from urllib.request import urlretrieve
-from typing import Union, Tuple
+from typing import Union
+from . import objects
 from . import exceptions
 from .utils import *
 
@@ -64,9 +64,6 @@ class compendium(object):
             - notes: the response schema of `creatures` is different from the others, as it has two sub categories: food and non_food
         """
 
-        if not timeout:
-            timeout = self.default_timeout
-
         if category not in ["creatures", "equipment", "materials", "monsters", "treasure"]:
             raise exceptions.NoCategoryError(category)
 
@@ -90,30 +87,16 @@ class compendium(object):
 
         return api_req(self.api.base_url, timeout)
 
-    def download_entry_image(self, entry: types.entry, output_file: Union[str, None]=None, get_entry_timeout: types.timeout=None) -> Tuple[str, HTTPMessage]:
+    def get_image(self, entry: types.entry) -> objects.entry_image:
         """
         Download the image of a compendium entry.
 
         Parameters:
-            * `entry`: The ID or name of the entry of the image to be downloaded.
+            * `entry`: The ID or name of the entry.
                 - type: str, int
-            * `output_file`: The output file's path.
-                - default: entry's name with a ".png" extension with spaces replaced by underscores
-                - type: str
-            * `get_entry_timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`.
-                - default: `compendium.default_timeout`
-                - type: int, float, tuple (for connect and read timeouts)
 
-        Returns: path to the newly created image and the resulting HTTPMessage object.
-            - type: tuple
+        Returns: Entry image object
+            - type: `objects.entry_image`
         """
 
-        if not get_entry_timeout:
-            get_entry_timeout = self.default_timeout
-
-        entry_data: dict = self.get_entry(entry, timeout=get_entry_timeout)
-
-        if not output_file:
-            output_file = f"{entry_data['name'].replace(' ', '_')}.png"
-
-        return urlretrieve(entry_data["image"], output_file)
+        return objects.entry_image(self.get_entry(entry), self.api)
