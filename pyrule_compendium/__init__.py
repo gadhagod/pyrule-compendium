@@ -92,7 +92,7 @@ class compendium(object):
 
     def get_image(self, entry: types.entry) -> objects.entry_image:
         """
-        Download the image of a compendium entry.
+        Retrieves the image of a compendium entry.
 
         Parameters:
             * `entry`: The ID or name of the entry.
