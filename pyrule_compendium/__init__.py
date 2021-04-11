@@ -64,6 +64,9 @@ class compendium(object):
             - notes: the response schema of `creatures` is different from the others, as it has two sub categories: food and non_food
         """
 
+        if not timeout:
+            timeout = self.default_timeout
+
         if category not in ["creatures", "equipment", "materials", "monsters", "treasure"]:
             raise exceptions.NoCategoryError(category)
 
