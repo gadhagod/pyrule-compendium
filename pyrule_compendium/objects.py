@@ -11,16 +11,6 @@ class entry_image(object):
             - type: dict
         * `_api`: Instance of `utils.api`
             - type: `utils.api`
-
-    Attributes:
-        * `_api`: `_api` parameter.
-        * `entry_data`: `entry_data` parameter.
-        * `url`: The URL of the image.
-            - type: str
-        * `res`: Response object of request.
-            - type: `requests.models.Response`
-        * `binary`: Raw binary image.
-            - type: str
     """
     def __init__(self, entry_data: dict, _api: api):
         self._api = api
@@ -29,7 +19,7 @@ class entry_image(object):
         self.res: Response = get(self.url, stream=True)
         self.binary = self.res.text
 
-    def download(self, output_file=None) -> None: 
+    def download(self, output_file: str=None) -> None: 
         """
         Downloads the entry image object.
 
@@ -43,3 +33,6 @@ class entry_image(object):
             output_file = f"{entry_name}.png"
 
         copyfileobj(self.res.raw, open(output_file, "wb"))
+
+    def get_binary(self) -> str: return self.binary
+    def get_url(self) -> str: return self.url

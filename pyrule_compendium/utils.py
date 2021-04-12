@@ -5,7 +5,7 @@ class types:
     entry = Union[int, str]
     timeout = Union[int, float, None]
 
-def api_req(url: str, timeout: types.timeout) -> Union[list, dict]: return get(url, timeout=timeout).json()["data"]
+def api_req(url: str, timeout: types.timeout=None) -> Union[list, dict]: return get(url, timeout=timeout).json()["data"]
 
 class api():
     def __init__(self, base_url: str): self.base_url = base_url
