@@ -3,7 +3,7 @@ from os import getenv
 
 setuptools.setup(
     name="pyrule-compendium",
-    version=getenv("RELEASE_NUM"),
+    version=getenv("VERSION_NUM"),
     author="Aarav Borthakur",
     author_email="gadhaguy13@gmail.com",
     description="The official python wrapper for the Hyrule Compendium API",
