@@ -21,7 +21,7 @@ class defaults:
 
         _api = api(url)
         base = api_req(_api.base_url)
-        categories = list(base.keys())
+        categories = list(base.keys()) # type: ignore
 
         entries = []
         for category in base:
