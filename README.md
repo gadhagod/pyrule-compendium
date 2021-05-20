@@ -15,4 +15,4 @@ Detailed docs and guide [here](https://gadhagod.github.io/Hyrule-Compendium-API/
     print(compendium().get_entry("silver_lynel")) # get a specific entry with it's name
     print(compendium().get_entry(1)) # get a specific entry with it's ID
     print(compendium().get_category("monsters")) # get all entries in a category
-    compendium().download_entry_image("silver_lynel", "silver_lynel.png") # download entry image
+    compendium().get_image("silver_lynel").download() # download entry image
