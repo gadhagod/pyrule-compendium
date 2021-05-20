@@ -1,5 +1,4 @@
 from requests import get, Response
-from shutil import copyfileobj
 from .utils import *
 
 class entry_image(object):
@@ -16,8 +15,10 @@ class entry_image(object):
         self._api = api
         self.entry_data = entry_data
         self.url: str = _api.endpoint(f"/entry/{entry_data['name']}/image")
-        self.res: Response = get(self.url, stream=True)
+        self.res: Response = get(self.url)
         self.binary = self.res.text
+
+        self.res.raw.decode_content = True
 
     def download(self, output_file: str=None) -> None: 
         """
@@ -32,7 +33,7 @@ class entry_image(object):
             entry_name = self.entry_data["name"].replace(' ', '_')
             output_file = f"{entry_name}.png"
 
-        copyfileobj(self.res.raw, open(output_file, "wb"))
+        open(output_file, "wb").write(self.res.content)
 
     def get_binary(self) -> str: return self.binary
     def get_url(self) -> str: return self.url
