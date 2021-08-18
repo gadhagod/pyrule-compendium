@@ -11,9 +11,9 @@ jobs:
   main:
 
       runs-on: ubuntu-latest
-      stategy:
+      strategy:
         matrix:
-          python-version: [3.6, 3.7, 3.8, 3.9]
+          python-version: [3.9]
 
       steps:
       - uses: actions/checkout@v2
@@ -22,7 +22,8 @@ jobs:
 
       - name: Clear previous documentation
         run: |
-          rm -r docs/*
+          rm -r docs
+          mkdir docs
 
       - name: Clone master branch
         run: |
