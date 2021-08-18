@@ -22,7 +22,8 @@ jobs:
 
       - name: Clear previous documentation
         run: |
-          rm -r docs/*
+          rm -r docs
+          mkdir docs
 
       - name: Clone master branch
         run: |
