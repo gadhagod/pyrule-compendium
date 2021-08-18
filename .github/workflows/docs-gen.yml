@@ -1,0 +1,53 @@
+# This workflow generates and stashes documentation in `docs` branch
+
+name: Generate Docs
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  main:
+
+      runs-on: ubuntu-latest
+      stategy:
+        matrix:
+          python-version: [3.6, 3.7, 3.8, 3.9]
+
+      steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: docs
+
+      - name: Clear previous documentation
+        run: |
+          rm -r docs/*
+
+      - name: Clone master branch
+        run: |
+          git clone https://github.com/gadhagod/pyrule-compendium
+
+      - name: Install dependencies
+        run: |
+          sudo pip3 install pdoc3
+          sudo pip3 install ./pyrule-compendium
+
+      - name: Build documentation
+        run: |
+          pdoc pyrule_compendium --html
+          mv html/pyrule_compendium/* docs
+          rm -r html
+
+      - name: Commit files
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit --allow-empty -m "Update docs to version v${{ github.event.release.tag_name }}"
+
+      - name: Push to docs branch
+        uses: ad-m/github-push-action@master
+        with: 
+          branch: docs
+          github_token: ${{ secrets.GITHUB_TOKEN }}
