@@ -6,7 +6,7 @@ The official python API wrapper for the Hyrule Compendium API.
     pip3 install pyrule-compendium
 
 ## Documentation
-Detailed docs and guide [here](https://gadhagod.github.io/Hyrule-Compendium-API/#/client-libraries/python?id=python-wrapper).
+Detailed documentation can be found [here](https://gadhagod.github.io/pyrule-compendium).
 
 ## Basic Usage
     from pyrule_compendium import compendium
