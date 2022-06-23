@@ -20,4 +20,4 @@ print(comp).get_category("monsters")) # get all entries in a category
 comp.get_image("silver_lynel").download() # download entry image
 ```
 
-Made with :heart: by [Aarav Borthakur](https://github.com/gadhagod).
+Made with :heart: by [Aarav Borthakur](https://github.com/gadhagod) and [Shaunik Musukula](https://github.com/shaunikm).
