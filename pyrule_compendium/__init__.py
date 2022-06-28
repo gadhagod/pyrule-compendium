@@ -16,12 +16,14 @@ class compendium(object):
         * `default_timeout`: Default seconds to wait for response for all API calling functions until raising `requests.exceptions.ReadTimeout`
             - default: `None` (no timeout)
             - type: integer, float, tuple (for connect and read timeouts)
-            - notes: If an API calling function has a parameter `timeout`, it will overide this
+            - notes: If an API calling function has a parameter `timeout`, it will override this
     """
 
-    def __init__(self, base_url: str="https://botw-compendium.herokuapp.com/api/v2", default_timeout: Union[int, float, None]=None):
+    def __init__(self, base_url: str="https://botw-compendium.herokuapp.com/api/v2", default_timeout: Union[int, float, None]=None, master_mode: bool = False):
         self.api: api = api(base_url)
         self.default_timeout = default_timeout
+        self.master_mode = master_mode
+        if self.master_mode: self.master_api: api = api("https://botw-compendium.herokuapp.com/api/v2/master_mode")
 
     def get_entry(self, entry: types.entry, timeout: types.timeout=None) -> dict:
         """
@@ -42,10 +44,11 @@ class compendium(object):
             timeout = self.default_timeout
 
         res: dict = self.api.request(f"/entry/{entry}", timeout)
-        if res == {}:
-            raise exceptions.NoEntryError(entry)
+        if not res:
+            res = self.master_api.request(f"/entry/{entry}", timeout)
 
-        return res
+        if res: return res
+        raise exceptions.NoEntryError(entry)
 
     def get_category(self, category: str, timeout: types.timeout=None) -> Union[dict, list]:
         """
@@ -70,7 +73,10 @@ class compendium(object):
         if category not in ["creatures", "equipment", "materials", "monsters", "treasure"]:
             raise exceptions.NoCategoryError(category)
 
-        return self.api.request(f"/category/{category}", timeout)
+        if self.master_mode and category == "monsters":
+            return self.api.request("/category/monsters", timeout) + api_req(self.master_api.base_url, timeout)
+        else:
+            return self.api.request(f"/category/{category}", timeout)
 
     def get_all(self, timeout: types.timeout=None) -> Union[dict, list]:
         """
@@ -88,7 +94,12 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        return api_req(self.api.base_url, timeout)
+        if self.master_mode:
+            res: dict = api_req(self.api.base_url, timeout)
+            res["monsters"] += api_req(self.master_api.base_url, timeout)
+            return res
+        else:
+            return api_req(self.api.base_url, timeout)
 
     def get_image(self, entry: types.entry) -> objects.entry_image:
         """
@@ -102,4 +113,31 @@ class compendium(object):
             - type: `objects.entry_image`
         """
 
-        return objects.entry_image(self.get_entry(entry), self.api)
+        if self.is_master_mode(entry): return objects.entry_image(self.get_entry(entry), self.master_api)
+        else: return objects.entry_image(self.get_entry(entry), self.api)
+
+    def _is_master_mode_entry(self, entry: types.entry, timeout: types.timeout=None):
+        """
+        Determines if an entry is from master mode or not.
+
+        Parameters:
+            * `entry`: The ID or name of the entry.
+                - type: str, int
+            * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
+                - default: `compendium.default_timeout`
+                - type: int, float, tuple (for connect and read timeouts)
+
+        Returns: Whether an entry is from master mode or not
+            - type: `objects.entry_image`
+        """
+
+        if not timeout:
+            timeout = self.default_timeout
+
+        res: dict = self.api.request(f"/entry/{entry}", timeout)
+        if res: return False
+
+        res = self.master_api.request(f"/entry/{entry}", timeout)
+        if res: return True
+
+        else: raise exceptions.NoEntryError(entry)
