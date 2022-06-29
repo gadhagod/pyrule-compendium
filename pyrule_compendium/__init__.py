@@ -149,8 +149,13 @@ class compendium(object):
             - type: `objects.entry_image`
         """
 
-        if self._is_master_mode_entry(entry): return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.master_api)
-        else: return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.api)
+        if master_mode is None:
+            if self._is_master_mode_entry(entry): return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.master_api)
+            else: return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.api)
+        if master_mode is True:
+            return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.master_api)
+        if master_mode is False:
+            return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.api)
 
     def _is_master_mode_entry(self, entry: types.entry, timeout: types.timeout=None) -> bool:
         """
