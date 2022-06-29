@@ -25,7 +25,7 @@ class compendium(object):
         self.master_mode = master_mode
         if self.master_mode: self.master_api: api = api("https://botw-compendium.herokuapp.com/api/v2/master_mode")
 
-    def get_entry(self, entry: types.entry, timeout: types.timeout=None, is_from_master_mode: Union[bool, None]=None) -> dict:
+    def get_entry(self, entry: types.entry, timeout: types.timeout=None, master_mode: Union[bool, None]=None) -> dict:
         """
         Gets an entry from the compendium.
 
@@ -35,7 +35,7 @@ class compendium(object):
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
                 - default: `compendium.default_timeout`
                 - type: int, float, tuple (for connect and read timeouts)
-            *  `is_from_master_mode`: Specifies whether an entry is from master mode or not
+            *  `master_mode`: Specifies whether an entry is from master mode or not
                 - default: None
                 - type: bool, None
 
@@ -46,7 +46,7 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        if is_from_master_mode == None:
+        if master_mode == None:
             res: dict = self.api.request(f"/entry/{entry}", timeout)
             if not res and self.master_mode:
                 res = self.master_api.request(f"/entry/{entry}", timeout)
@@ -59,21 +59,21 @@ class compendium(object):
             else:
                 raise exceptions.NoEntryError(entry)
 
-        elif is_from_master_mode is True:
+        elif master_mode is True:
             res = self.master_api.request(f"/entry/{entry}", timeout)
             if res:
                 return res
             else:
                 raise exceptions.NoEntryError(entry)
 
-        elif is_from_master_mode is False:
+        elif master_mode is False:
             res: dict = self.api.request(f"/entry/{entry}", timeout)
             if res:
                 return res
             else:
                 raise exceptions.NoEntryError(entry)
 
-    def get_category(self, category: str, timeout: types.timeout=None, master_mode_exclusive: Union[bool, None]=None) -> Union[dict, list]:
+    def get_category(self, category: str, timeout: types.timeout=None, master_mode: Union[bool, None]=None) -> Union[dict, list]:
         """
         Gets all entries from a category in the compendium.
 
@@ -84,7 +84,7 @@ class compendium(object):
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
                 - default: `compendium.default_timeout`
                 - type: integer, float, tuple (for connect and read timeouts)
-            *  `master_mode_exclusive`: Controls whether metadata is exclusively returned from the master mode endpoint or not
+            *  `master_mode`: Controls whether metadata is exclusively returned from the master mode endpoint or not
                 - default: None
                 - type: bool, None
 
@@ -100,13 +100,13 @@ class compendium(object):
             raise exceptions.NoCategoryError(category)
 
         if self.master_mode and category == "monsters":
-            if master_mode_exclusive is True: return api_req(self.master_api.base_url, timeout)
-            elif master_mode_exclusive is False: return self.api.request("/category/monsters", timeout)
+            if master_mode is True: return api_req(self.master_api.base_url, timeout)
+            elif master_mode is False: return self.api.request("/category/monsters", timeout)
             else: return self.api.request("/category/monsters", timeout) + api_req(self.master_api.base_url, timeout)
         else:
-            if not master_mode_exclusive: return self.api.request(f"/category/{category}", timeout)
+            if not master_mode: return self.api.request(f"/category/{category}", timeout)
 
-    def get_all(self, timeout: types.timeout=None, master_mode_exclusive: Union[bool, None]=None) -> Union[dict, list]:
+    def get_all(self, timeout: types.timeout=None, master_mode: Union[bool, None]=None) -> Union[dict, list]:
         """
         Get all entries from the compendium.
 
@@ -114,7 +114,7 @@ class compendium(object):
             * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
                 - default: `compendium.default_timeout`
                 - type: integer, float, tuple (for connect and read timeouts)
-            *  `master_mode_exclusive`: Controls whether metadata is exclusively returned from the master mode endpoint or not
+            *  `master_mode`: Controls whether metadata is exclusively returned from the master mode endpoint or not
                 - default: None
                 - type: bool, None
 
@@ -125,23 +125,23 @@ class compendium(object):
         if not timeout:
             timeout = self.default_timeout
 
-        if self.master_mode and master_mode_exclusive is None:
+        if self.master_mode and master_mode is None:
             res: dict = api_req(self.api.base_url, timeout)
             res["monsters"] += api_req(self.master_api.base_url, timeout)
             return res
-        elif master_mode_exclusive is True:
+        elif master_mode is True:
             return api_req(self.master_api.base_url, timeout)
-        elif master_mode_exclusive is False or not self.master_mode:
+        elif master_mode is False or not self.master_mode:
             return api_req(self.api.base_url, timeout)
 
-    def get_image(self, entry: types.entry, is_from_master_mode: Union[bool, None]=None) -> objects.entry_image:
+    def get_image(self, entry: types.entry, master_mode: Union[bool, None]=None) -> objects.entry_image:
         """
         Retrieves the image of a compendium entry.
 
         Parameters:
             * `entry`: The ID or name of the entry.
                 - type: str, int
-            *  `is_from_master_mode`: Specifies whether an entry is from master mode or not
+            *  `master_mode`: Specifies whether an entry is from master mode or not
                 - default: None
                 - type: bool, None
 
@@ -149,8 +149,8 @@ class compendium(object):
             - type: `objects.entry_image`
         """
 
-        if self._is_master_mode_entry(entry): return objects.entry_image(self.get_entry(entry, is_from_master_mode=is_from_master_mode), self.master_api)
-        else: return objects.entry_image(self.get_entry(entry, is_from_master_mode=is_from_master_mode), self.api)
+        if self._is_master_mode_entry(entry): return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.master_api)
+        else: return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.api)
 
     def _is_master_mode_entry(self, entry: types.entry, timeout: types.timeout=None) -> bool:
         """
