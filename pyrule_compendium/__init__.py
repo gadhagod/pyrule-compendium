@@ -134,13 +134,16 @@ class compendium(object):
         elif master_mode is False or not self.master_mode:
             return api_req(self.api.base_url, timeout)
 
-    def get_image(self, entry: types.entry, master_mode: Union[bool, None]=None) -> objects.entry_image:
+    def get_image(self, entry: types.entry, timeout: types.timeout=None, master_mode: Union[bool, None]=None) -> objects.entry_image:
         """
         Retrieves the image of a compendium entry.
 
         Parameters:
             * `entry`: The ID or name of the entry.
                 - type: str, int
+            * `timeout`: Seconds to wait for response until raising `requests.exceptions.ReadTimeout`
+                - default: `compendium.default_timeout`
+                - type: integer, float, tuple (for connect and read timeouts)
             *  `master_mode`: Specifies whether an entry is from master mode or not
                 - default: None
                 - type: bool, None
@@ -149,13 +152,16 @@ class compendium(object):
             - type: `objects.entry_image`
         """
 
+        if not timeout:
+            timeout = self.default_timeout
+
         if master_mode is None:
-            if self._is_master_mode_entry(entry): return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.master_api)
-            else: return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.api)
+            if self._is_master_mode_entry(entry): return objects.entry_image(self.get_entry(entry, timeout=timeout, master_mode=master_mode), self.master_api)
+            else: return objects.entry_image(self.get_entry(entry, timeout=timeout, master_mode=master_mode), self.api)
         if master_mode is True:
-            return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.master_api)
+            return objects.entry_image(self.get_entry(entry, timeout=timeout, master_mode=master_mode), self.master_api)
         if master_mode is False:
-            return objects.entry_image(self.get_entry(entry, master_mode=master_mode), self.api)
+            return objects.entry_image(self.get_entry(entry, timeout=timeout, master_mode=master_mode), self.api)
 
     def _is_master_mode_entry(self, entry: types.entry, timeout: types.timeout=None) -> bool:
         """
