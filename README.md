@@ -16,7 +16,7 @@ comp = compendium()
 print(comp.get_all()) # get all entries
 print(comp.get_entry("silver_lynel")) # get a specific entry with it's name
 print(comp.get_entry(1)) # get a specific entry with it's ID
-print(comp).get_category("monsters")) # get all entries in a category
+print(comp.get_category("monsters")) # get all entries in a category
 comp.get_image("silver_lynel").download() # download entry image
 ```
 
